@@ -207,24 +207,49 @@ class HBNBCommand(cmd.Cmd):
         - If the command is recognized and executed, it returns the result of the executed command.
         - If the command is not recognized, it prints a message and returns
         """
-        arg_dict = {
-            "all": self.do_all,
-            "show": self.do_show,
-            "destroy": self.do_destroy,
-            "count": self.do_count,
-            "update": self.do_update
-        }
-        match = re.search(r"\.", arg)
-        if match is not None:
-            args = [arg[:match.span()[0]], arg[match.span()[1]:]]
-            match = re.search(r"\((.*?)\)", args[1])
-            if match is not None:
-                command = [args[1][:match.span()[0]], match.group()[1:-1]]
-                if command[0] in arg_dict.keys():
-                    call = "{} {}".format(args[0], command[1])
-                    return arg_dict[command[0]](call)
-        print("*** Unknown syntax: {}".format(arg))
-        return False
+        args = arg.split('.')
+        class_arg = args[0]
+        if len(args) == 1:
+            print("*** Unknown syntax: {}".format(arg))
+            return
+        try:
+            args = args[1].split('(')
+            command = args[0]
+            if command == 'all':
+                HBNBCommand.do_all(self, class_arg)
+            elif command == 'count':
+                HBNBCommand.do_count(self, class_arg)
+            elif command == 'show':
+                args = args[1].split(')')
+                id_arg = args[0]
+                id_arg = id_arg.strip("'")
+                id_arg = id_arg.strip('"')
+                line = class_arg + ' ' + id_arg
+                HBNBCommand.do_show(self, line)
+            elif command == 'destroy':
+                args = args[1].split(')')
+                id_arg = args[0]
+                id_arg = id_arg.strip('"')
+                id_arg = id_arg.strip("'")
+                line = class_arg + ' ' + id_arg
+                HBNBCommand.do_destroy(self, line)
+            elif command == 'update':
+                args = args[1].split(',')
+                id_arg = args[0].strip("'")
+                id_arg = id_arg.strip('"')
+                name_arg = args[1].strip(',')
+                val_arg = args[2]
+                name_arg = name_arg.strip(' ')
+                name_arg = name_arg.strip("'")
+                name_arg = name_arg.strip('"')
+                val_arg = val_arg.strip(' ')
+                val_arg = val_arg.strip(')')
+                line = class_arg + ' ' + id_arg + ' ' + name_arg + ' ' + val_arg
+                HBNBCommand.do_update(self, line)
+            else:
+                print("*** Unknown syntax: {}".format(arg))
+        except IndexError:
+            print("*** Unknown syntax: {}".format(arg))
 
     def do_update(self, arg):
         """
@@ -240,26 +265,25 @@ class HBNBCommand(cmd.Cmd):
         """
         args = arg.split()
 
-        if len(args) >= 4:
-            key = "{}.{}".format(args[0], args[1])
-            cast = type(eval(args[3]))
-            arg3 = args[3]
-            arg3 = arg3.strip('"')
-            arg3 = arg3.strip("'")
-            setattr(storage.all()[key], args[2], cast(arg3))
-            storage.all()[key].save()
-        elif len(args) == 0:
+        if len(args) == 0:
             print("** class name missing **")
         elif args[0] not in HBNBCommand.class_dict:
             print("** class doesn't exist **")
         elif len(args) == 1:
             print("** instance id missing **")
-        elif ("{}.{}".format(args[0], args[1])) not in storage.all().keys():
-            print("** no instance found **")
         elif len(args) == 2:
             print("** attribute name missing **")
-        else:
+        elif len(args) == 3:
             print("** value missing **")
+        else:
+            key = "{}.{}".format(args[0], args[1])
+            if key not in storage.all().keys():
+                print("** no instance found **")
+            else:
+                cast = type(eval(args[3]))
+                arg3 = args[3].strip('\"').strip('\'')
+                setattr(storage.all()[key], args[2], cast(arg3))
+                storage.all()[key].save()
 
 
 if __name__ == '__main__':
