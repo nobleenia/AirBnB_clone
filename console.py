@@ -62,10 +62,10 @@ class HBNBCommand(cmd.Cmd):
         Returns:
             bool: True to exit the CLI
         """
-        print()
+        print("")
         return True
 
-    def do_emptyline(self):
+    def emptyline(self):
         """
         Command: <empty line>
         Do nothing when an empty line is entered
@@ -184,6 +184,16 @@ class HBNBCommand(cmd.Cmd):
                 if args[0] in key:
                     obj_print.append(objects)
             print(obj_print)
+
+    def do_count(self, arg):
+        """Usage: count <class> or <class>.count()
+        Retrieve the number of instances of a given class."""
+        args = parse(arg)
+        count = 0
+        for obj in storage.all().values():
+            if args[0] == obj.__class__.__name__:
+                count += 1
+        print(count)
 
     def do_update(self, arg):
         """
