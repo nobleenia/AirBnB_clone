@@ -263,7 +263,7 @@ class HBNBCommand(cmd.Cmd):
         Example usage:
         $ update BaseModel 1234-1234-1234 name "New Name"
         """
-        args = arg.split()
+        args = parse(arg)
 
         if len(args) == 0:
             print("** class name missing **")
@@ -285,6 +285,11 @@ class HBNBCommand(cmd.Cmd):
                 setattr(storage.all()[key], args[2], cast(arg3))
                 storage.all()[key].save()
 
+    def parse(line):
+        """
+        Helper method to parse user typed input
+        """
+        return tuple(line.split())
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
