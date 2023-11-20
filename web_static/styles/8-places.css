@@ -1,5 +1,7 @@
 .places {
     text-align: center;
+    flex-direction: column;
+    padding-left: 30px;
 }
 
 .places h1 {
@@ -20,7 +22,8 @@ article {
 
 article h2 {
     font-size: 30px;
-    text-align: center;
+    margin-top: -1px;
+    padding-left: 0%;
 }
 
 .price_by_night {
@@ -33,7 +36,7 @@ article h2 {
     font-size: 30px;
     position: relative;
     float: right;
-    top: -80px; 
+    top: 10px;
 }
 
 .information {
